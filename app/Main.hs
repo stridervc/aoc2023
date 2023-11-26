@@ -4,20 +4,10 @@ import qualified Data.Map as M
 import System.Environment (getArgs)
 
 import qualified Day01 (solve)
-import qualified Day02 (solve)
-import qualified Day03 (solve)
-import qualified Day04 (solve)
-import qualified Day05 (solve)
-import qualified Day06 (solve)
 
 solutions :: M.Map String (String -> IO ())
 solutions = M.fromList
   [ ("01", Day01.solve)
-  , ("02", Day02.solve)
-  , ("03", Day03.solve)
-  , ("04", Day04.solve)
-  , ("05", Day05.solve)
-  , ("06", Day06.solve)
   ]
 
 solveSingle :: String -> IO ()
