@@ -6,14 +6,38 @@ import qualified Text.Parsec as P
 
 import Helpers
 
-dayParser :: Parser a
-dayParser = undefined
+import Data.Char (isDigit)
 
-part1 :: a -> IO ()
-part1 input = putStrLn "n/a"
+parseLine :: Parser String
+parseLine = P.manyTill P.anyChar P.newline
 
-part2 :: a -> IO ()
-part2 input = putStrLn "n/a"
+dayParser :: Parser [String]
+dayParser = P.many parseLine
+
+calibration :: String -> Int
+calibration s = read [ head digits, last digits ]
+  where digits  = filter isDigit s
+
+part1 :: [String] -> IO ()
+part1 input = print $ sum $ map calibration input
+
+subWords :: String -> String
+subWords s
+  | length s < 3  = s
+  | is "one"      = "1" <> subWords (tail s)
+  | is "two"      = "2" <> subWords (tail s)
+  | is "three"    = "3" <> subWords (tail s)
+  | is "four"     = "4" <> subWords (tail s)
+  | is "five"     = "5" <> subWords (tail s)
+  | is "six"      = "6" <> subWords (tail s)
+  | is "seven"    = "7" <> subWords (tail s)
+  | is "eight"    = "8" <> subWords (tail s)
+  | is "nine"     = "9" <> subWords (tail s)
+  | otherwise     = head s : subWords (tail s)
+  where is w      = take (length w) s == w
+
+part2 :: [String] -> IO ()
+part2 input = print $ sum $ map (calibration . subWords) input
 
 solve :: String -> IO ()
 solve day = do
