@@ -15,6 +15,7 @@ library
   exposed-modules:
     Helpers
     Day01
+    Day02
 
 executable aoc2023
     import:           warnings
