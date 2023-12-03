@@ -16,6 +16,7 @@ library
     Helpers
     Day01
     Day02
+    Day03
 
 executable aoc2023
     import:           warnings

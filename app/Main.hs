@@ -5,11 +5,13 @@ import System.Environment (getArgs)
 
 import qualified Day01 (solve)
 import qualified Day02 (solve)
+import qualified Day03 (solve)
 
 solutions :: M.Map String (String -> IO ())
 solutions = M.fromList
   [ ("01", Day01.solve)
   , ("02", Day02.solve)
+  , ("03", Day03.solve)
   ]
 
 solveSingle :: String -> IO ()
