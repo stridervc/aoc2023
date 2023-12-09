@@ -30,6 +30,13 @@ compareCards a b
   | a == 'K' && b == 'A'    = LT
   | otherwise               = GT
 
+compareCards2 :: Card -> Card -> Ordering
+compareCards2 a b
+  | a == b    = EQ
+  | a == 'J'  = LT
+  | b == 'J'  = GT
+  | otherwise = compareCards a b
+
 compareHands :: Hand -> Hand -> Ordering
 compareHands a@(a1:as) b@(b1:bs)
   | handType a /= handType b  = compare (handType a) (handType b)
@@ -37,6 +44,12 @@ compareHands a@(a1:as) b@(b1:bs)
   where compare' (a:as) (b:bs)  | a == b    = compare' as bs
                                 | otherwise = compareCards a b
 
+compareHands2 :: Hand -> Hand -> Ordering
+compareHands2 a@(a1:as) b@(b1:bs)
+  | handType2 a /= handType2 b  = compare (handType2 a) (handType2 b)
+  | otherwise                   = compare' a b
+  where compare' (a:as) (b:bs)  | a == b    = compare' as bs
+                                | otherwise = compareCards2 a b
 handType :: Hand -> HandType
 handType hand
   | mt 5                                = FiveKind
@@ -62,6 +75,21 @@ handType hand
         mt n  = m (t n h)
         md n   = m (d n h)
 
+handType2 :: Hand -> HandType
+handType2 hand
+  | js == 0                     = handType hand
+  | og == HighCard              = Pair
+  | og == Pair                  = ThreeKind
+  | og == TwoPair && js == 1    = FullHouse
+  | og == TwoPair && js == 2    = FourKind
+  | og == ThreeKind             = FourKind
+  | og == FullHouse && js == 1  = FourKind
+  | og == FullHouse && js >= 2  = FiveKind
+  | og == FourKind              = FiveKind
+  | otherwise                   = FiveKind
+  where og  = handType hand
+        js  = length $ filter (=='J') hand
+
 parseLine :: Parser HandBid
 parseLine = do
   hand <- P.count 5 P.anyChar
@@ -79,8 +107,11 @@ part1 input = print $ sum $ map winnings ranked
         ranked              = zip [1..] $ sortBy f input
         winnings (r, (_,b)) = r * b
 
-part2 :: a -> IO ()
-part2 input = putStrLn "n/a"
+part2 :: [HandBid] -> IO ()
+part2 input = print $ sum $ map winnings ranked
+  where f (h1,b1) (h2,b2)   = compareHands2 h1 h2
+        ranked              = zip [1..] $ sortBy f input
+        winnings (r, (_,b)) = r * b
 
 solve :: String -> IO ()
 solve day = do
