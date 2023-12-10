@@ -13,6 +13,7 @@ import qualified Day07 (solve)
 import qualified Day08 (solve)
 import qualified Day09 (solve)
 import qualified Day10 (solve)
+import qualified Day11 (solve)
 
 solutions :: M.Map String (String -> IO ())
 solutions = M.fromList
@@ -26,6 +27,7 @@ solutions = M.fromList
   , ("08", Day08.solve)
   , ("09", Day09.solve)
   , ("10", Day10.solve)
+  , ("11", Day11.solve)
   ]
 
 solveSingle :: String -> IO ()
@@ -37,7 +39,8 @@ solveSingle day = do
 
 main :: IO ()
 main = do
-  args <- getArgs
+  -- args <- getArgs
+  let args = ["09"]
   if null args
-    then solveSingle $ fst $ M.findMax solutions
+    then solveSingle $ last $ M.keys solutions
     else mapM_ solveSingle args
