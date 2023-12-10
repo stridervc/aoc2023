@@ -4,6 +4,7 @@ module Day10
 
 import qualified Text.Parsec as P
 import qualified Data.Map.Strict as M
+import qualified Data.Set as S
 
 import Helpers
 import qualified Grid2D as G
@@ -50,10 +51,10 @@ startPipe pg
         ec    = ep == '-' || ep == 'J' || ep == '7'
         wc    = wp == '-' || wp == 'F' || wp == 'L'
 
-loopLength :: Int -> G.Coord -> G.Coord -> PipesGrid -> Int
-loopLength count prev curr@(x,y) pg
-  | curr == start && count > 0  = count
-  | otherwise                   = loopLength (count+1) curr next pg
+mainLoop :: S.Set G.Coord -> G.Coord -> G.Coord -> PipesGrid -> S.Set G.Coord
+mainLoop pipes prev curr@(x,y) pg
+  | curr == start && S.size pipes > 0 = pipes
+  | otherwise                         = mainLoop (S.insert curr pipes) curr next pg
   where start = startCoord pg
         cp    | curr == start = startPipe pg
               | otherwise     = G.getTile curr pg
@@ -67,14 +68,29 @@ loopLength count prev curr@(x,y) pg
               | otherwise           = head nexts
 
 part1 :: PipesGrid -> IO ()
-part1 pg = print $ loopLength 0 (0,0) start pg `div` 2
+part1 pg = print $ S.size (mainLoop mempty (0,0) start pg) `div` 2
   where start = startCoord pg
 
-part2 :: a -> IO ()
-part2 input = putStrLn "n/a"
+markOutside :: PipesGrid -> PipesGrid
+markOutside g = borders
+  where grid'   = G.grid g
+        loop    = mainLoop mempty (0,0) start g
+        start   = startCoord g
+        minx    = G.minX g
+        maxx    = G.maxX g
+        miny    = G.minY g
+        maxy    = G.maxY g
+        coords  = filter (`S.notMember` loop) $ [(x,miny) | x <- [minx..maxx]]
+                                             <> [(x,maxy) | x <- [minx..maxx]]
+                                             <> [(minx,y) | y <- [miny..maxy]]
+                                             <> [(maxx,y) | y <- [miny..maxy]]
+        borders = foldl (\g c -> G.putTile c 'O' g) g coords
+
+part2 :: PipesGrid -> IO ()
+part2 input = G.print id $ markOutside input
 
 solve :: String -> IO ()
 solve day = do
-  parsed <- parseInput day dayParser
+  parsed <- parseTestInput day dayParser
   part1 parsed
   part2 parsed
