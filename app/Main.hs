@@ -39,8 +39,7 @@ solveSingle day = do
 
 main :: IO ()
 main = do
-  -- args <- getArgs
-  let args = ["09"]
+  args <- getArgs
   if null args
     then solveSingle $ last $ M.keys solutions
     else mapM_ solveSingle args
