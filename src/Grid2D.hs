@@ -2,6 +2,7 @@ module Grid2D
   ( Grid (..)
   , Coord
   , newGrid
+  , newGridFromList
   , putTile
   , getTile
   , findTiles
@@ -38,12 +39,17 @@ newGrid def = Grid
   , maxYCoord = Nothing
   }
 
+newGridFromList :: Eq a => Maybe a -> [[a]] -> Grid a
+newGridFromList def as = foldl putrow g $ zip [0..] as
+  where g               = newGrid def
+        putrow g (y,r)  = foldl (\g (x,t) -> putTile (x,y) t g) g $ zip [0..] r
+
 -- place a tile in the grid, unless the tile is a default tile
 -- update min and max x and y even if it's a default tile
 putTile :: Eq a => Coord -> a -> Grid a -> Grid a
 putTile coord@(x,y) tile g
-  | isJust mdef && tile == def'   = g'
-  | otherwise                     = g' { grid = grid' }
+  | isJust mdef && tile == def' && empty  = g'
+  | otherwise                             = g' { grid = grid' }
   where mdef  = def g
         def'  = fromJust mdef
         grid' = M.insert coord tile $ grid g
@@ -60,6 +66,7 @@ putTile coord@(x,y) tile g
                   Nothing -> y
                   Just y' -> max y y'
         g'    = g { minXCoord = Just minx, maxXCoord = Just maxx, minYCoord = Just miny, maxYCoord = Just maxy }
+        empty = M.notMember coord $ grid g
 
 -- get a tile from the grid, returns default if it doesn't exist
 getTile :: Coord -> Grid a -> a

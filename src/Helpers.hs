@@ -7,6 +7,7 @@ module Helpers
   , parseNegInt
   , parseInt
   , parseInts
+  , pairs
   ) where
 
 import qualified Text.Parsec as P
@@ -68,3 +69,9 @@ parseInts = P.many1 $ do
   num <- parseInt
   P.newline
   return num
+
+-- generate all pairs of list items
+pairs :: [a] -> [(a,a)]
+pairs []      = []
+pairs [a,b]   = [(a,b)]
+pairs (a:xs)  = [(a,x) | x <- xs] <> pairs xs
