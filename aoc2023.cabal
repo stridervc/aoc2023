@@ -26,6 +26,7 @@ library
     Day09
     Day10
     Day11
+    Day12
 
 executable aoc2023
     import:           warnings
