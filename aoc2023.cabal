@@ -12,21 +12,9 @@ common warnings
 library
   hs-source-dirs: src
   build-depends:  base, parsec, containers, mtl
-  exposed-modules:
-    Helpers
-    Grid2D
-    Day01
-    Day02
-    Day03
-    Day04
-    Day05
-    Day06
-    Day07
-    Day08
-    Day09
-    Day10
-    Day11
-    Day12
+  exposed-modules: Helpers Grid2D
+    Day01 Day02 Day03 Day04 Day05 Day06 Day07
+    Day08 Day09 Day10 Day11 Day12 Day13
 
 executable aoc2023
     import:           warnings
