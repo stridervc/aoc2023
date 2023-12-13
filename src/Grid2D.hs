@@ -10,12 +10,16 @@ module Grid2D
   , maxX
   , minY
   , maxY
+  , toList
+  , transpose
   , Grid2D.print
   , orthogonalCoords
   , orthogonalTiles
   ) where
 
 import qualified Data.Map.Strict as M
+import qualified Data.List as L
+
 import Data.Maybe (isJust, fromJust)
 
 type Coord  = (Int, Int)
@@ -40,7 +44,7 @@ newGrid def = Grid
   }
 
 newGridFromList :: Eq a => Maybe a -> [[a]] -> Grid a
-newGridFromList def as = foldl putrow g $ zip [0..] as
+newGridFromList def as  = foldl putrow g $ zip [0..] as
   where g               = newGrid def
         putrow g (y,r)  = foldl (\g (x,t) -> putTile (x,y) t g) g $ zip [0..] r
 
@@ -103,6 +107,20 @@ maxY g = case maxYCoord g of
           Nothing -> error "maxY: no tiles placed yet"
           Just y  -> y
 
+-- get values as 2d list
+toList :: Grid a -> [[a]]
+toList g = map row [miny..maxy]
+  where minx  = minX g
+        maxx  = maxX g
+        miny  = minY g
+        maxy  = maxY g
+        row y = [getTile (x,y) g | x <- [minx..maxx]]
+
+transpose :: Eq a => Grid a -> Grid a
+transpose g = newGridFromList def' (L.transpose l)
+  where def'  = def g
+        l     = toList g
+
 print :: (a -> Char) -> Grid a -> IO ()
 print f g = do
   putStrLn $ show (minx, miny) <> " to " <> show (maxx, maxy)
@@ -111,8 +129,9 @@ print f g = do
         maxx        = maxX g
         miny        = minY g
         maxy        = maxY g
+        list        = toList g
+        row y       = list !! y
         printrow y  = putStrLn $ map f $ row y
-        row y       = [getTile (x,y) g | x <- [minx..maxx]]
 
 orthogonalCoords :: Grid a -> Coord -> [Coord]
 orthogonalCoords g (x,y) = filter (`M.member` grid') [ (x-1,y), (x+1,y), (x,y-1), (x,y+1) ]
