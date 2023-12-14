@@ -15,11 +15,15 @@ module Grid2D
   , Grid2D.print
   , orthogonalCoords
   , orthogonalTiles
+  , parseCharGrid
+  , mapToRows
   ) where
 
 import qualified Data.Map.Strict as M
 import qualified Data.List as L
+import qualified Text.Parsec as P
 
+import Text.Parsec.String (Parser)
 import Data.Maybe (isJust, fromJust)
 
 type Coord  = (Int, Int)
@@ -139,3 +143,19 @@ orthogonalCoords g (x,y) = filter (`M.member` grid') [ (x-1,y), (x+1,y), (x,y-1)
 
 orthogonalTiles :: Grid a -> Coord -> [a]
 orthogonalTiles g coord = map (`getTile` g) $ orthogonalCoords g coord
+
+parseCharGrid :: Maybe Char -> Parser (Grid Char)
+parseCharGrid def = do
+  l <- parseRow
+  ls <- P.many parseRow
+  return $ newGridFromList def (l:ls)
+  where parseRow  = do
+          c <- P.anyChar
+          cs <- P.manyTill P.anyChar P.newline
+          return (c:cs)
+
+-- apply function f to each row
+mapToRows :: Eq a => ([a] -> [a]) -> Grid a -> Grid a
+mapToRows f g = newGridFromList def' $ map f list
+  where list  = toList g
+        def'  = def g
